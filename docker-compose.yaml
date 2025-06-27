@@ -1,0 +1,116 @@
+
+name: monorepo
+
+services:
+  sonarqube:
+    image: sonarqube:10.4-community
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://postgres:5432/sonarqube
+      SONAR_JDBC_USERNAME: postgres
+      SONAR_JDBC_PASSWORD: postgres
+    depends_on:
+      - postgres
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_extensions:/opt/sonarqube/extensions
+
+  consul:
+    image: consul:1.15
+    container_name: consul
+    ports:
+      - "8500:8500"      # UI & HTTP API
+      - "8600:8600/udp"  # DNS (optional)
+    command: agent -dev -client=0.0.0.0
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse
+    volumes:
+      - ./clickhouse/config.xml:/etc/clickhouse-server/config.xml
+      - ./clickhouse/users.xml:/etc/clickhouse-server/users.xml
+      - ./clickhouse/data:/var/lib/clickhouse
+    ports:
+      - "8123:8123"  # HTTP interface
+      - "9000:9000"  # Native interface
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432" # PostgreSQL interface
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -d flagsmith -U postgres']
+      interval: 2s
+      timeout: 2s
+      retries: 20
+      start_period: 20s
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  flagsmith:
+    image: docker.flagsmith.com/flagsmith/flagsmith:latest
+    container_name: flagsmith
+    environment:
+      # All environments variables are available here:
+      # API: https://docs.flagsmith.com/deployment/locally-api#environment-variables
+      # UI: https://docs.flagsmith.com/deployment/locally-frontend#environment-variables
+
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
+      USE_POSTGRES_FOR_ANALYTICS: 'true' # Store API and Flag Analytics data in Postgres
+
+      ENVIRONMENT: production # set to 'production' in production.
+      DJANGO_ALLOWED_HOSTS: '*' # Change this in production
+      FLAGSMITH_DOMAIN: localhost:8000 # Change this in production
+      DJANGO_SECRET_KEY: secret # Change this in production
+      # PREVENT_SIGNUP: 'true' # Uncomment to prevent any additional signups
+      # ALLOW_REGISTRATION_WITHOUT_INVITE: 'true' # Uncomment and set to false to only allow signups via invitations
+
+      # Enable Task Processor
+      TASK_RUN_METHOD: TASK_PROCESSOR # other options are: SYNCHRONOUSLY, SEPARATE_THREAD (default)
+      PROMETHEUS_ENABLED: 'true'
+
+      # Uncomment if you want to enable Google OAuth. Note this does not turn Google OAuth on. You still need to use
+      # Flagsmith on Flagsmith to enable it - https://docs.flagsmith.com/deployment/#oauth_google
+      # DJANGO_SECURE_CROSS_ORIGIN_OPENER_POLICY: 'same-origin-allow-popups'
+
+      # For more info on configuring E-Mails - https://docs.flagsmith.com/deployment/locally-api#environment-variables
+      # Example SMTP:
+      # EMAIL_BACKEND: django.core.mail.backends.smtp.EmailBackend
+      # EMAIL_HOST: mail.example.com
+      # SENDER_EMAIL: flagsmith@example.com
+      # EMAIL_HOST_USER: flagsmith@example.com
+      # EMAIL_HOST_PASSWORD: smtp_account_password
+      # EMAIL_PORT: 587 # optional
+      # EMAIL_USE_TLS: 'true' # optional
+    ports:
+      - 8000:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  sonarqube_data:
+    driver: local
+  sonarqube_logs:
+    driver: local
+  sonarqube_extensions:
+    driver: local
+  consul-data:
+    driver: local
+  clickhouse-data:
+    driver: local
+  postgres-data:
+    driver: local

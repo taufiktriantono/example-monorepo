@@ -1,0 +1,47 @@
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.pyc
+*.o
+*.a
+*.out
+
+# Go build cache
+/bin
+/build
+/dist
+
+# Git files
+.git
+.gitignore
+
+# Sonar
+.sonarlint
+.scannerwork
+
+# IDE/editor
+.vscode
+.idea
+
+# Logs
+*.log
+*.tmp
+
+# Test artifacts
+coverage*
+*.test
+
+# Config lokal / contoh
+configs/config.yaml
+configs/model.conf
+.env
+.env.*
+docker-compose.override.yml
+
+# Node/npm (jika ada front-end atau monorepo)
+node_modules
+npm-debug.log
+yarn.lock
+pnpm-lock.yaml
