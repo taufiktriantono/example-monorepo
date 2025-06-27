@@ -22,7 +22,10 @@ type Config struct {
 	AppName      string `mapstructure:"APP_NAME"`
 	AppVersion   string `mapstructure:"APP_VERSION"`
 	AppNamespace string `mapstructure:"APP_NAMESPACE"`
-	Server       struct {
+	Pyroscope    struct {
+		Addr string `mapstructure:"ADDR"`
+	} `mapstructure:"PYROSCOPE"`
+	Server struct {
 		Addr           string        `mapstructure:"ADDR"`
 		ReadTimeout    time.Duration `mapstructure:"READ_TIMEOUT"`
 		WriteTimeout   time.Duration `mapstructure:"WRITE_TIMEOUT"`
@@ -55,6 +58,9 @@ type Config struct {
 		Password string `mapstructure:"PASSWORD"`
 		DB       int    `mapstructure:"DB"`
 	} `mapstructure:"REDIS"`
+	Kafka struct {
+		Addrs string `mapstructure:"ADDR"`
+	}
 	ConnectionPool struct {
 		MaxIdleConn     int           `mapstructure:"MAX_IDLE_CONN"`
 		MaxOpenConn     int           `mapstructure:"MAX_OPEN_CONN"`

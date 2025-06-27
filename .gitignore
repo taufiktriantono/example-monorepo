@@ -81,5 +81,5 @@ docker-compose.yml
 api-specs/
 
 configs/config.yaml
-
+docker-compose.yaml
 redocly.yaml

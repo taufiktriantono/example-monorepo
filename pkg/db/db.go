@@ -23,7 +23,7 @@ var Module = fx.Module("database",
 	),
 )
 
-func New(lc fx.Lifecycle, cfg *config.Config, dialector gorm.Dialector, opts ...gorm.Option) (*gorm.DB, error) {
+func New(cfg *config.Config, dialector gorm.Dialector, opts ...gorm.Option) (*gorm.DB, error) {
 	// Initialize the GORM DB connection
 	db, err := gorm.Open(dialector, opts...)
 	if err != nil {
@@ -36,28 +36,6 @@ func New(lc fx.Lifecycle, cfg *config.Config, dialector gorm.Dialector, opts ...
 		zap.L().Info("[DB] 🔍 Database is running in DEBUG mode")
 	}
 
-	sqlDB, err := db.DB()
-	if err != nil {
-		return nil, err
-	}
-
-	sqlDB.SetMaxIdleConns(cfg.ConnectionPool.MaxIdleConn)
-	sqlDB.SetMaxOpenConns(cfg.ConnectionPool.MaxOpenConns)
-	sqlDB.SetConnMaxLifetime(cfg.ConnectionPool.ConnMaxLifetime)
-	sqlDB.SetConnMaxIdleTime(cfg.ConnectionPool.ConnMaxIdleTime)
-
-	// db.Callback().Create().Before("gorm:create").Register("audit_before_create", BeforeCreate)
-	// db.Callback().Update().Before("gorm:update").Register("audit_before_update", BeforeUpdate)
-
-	zap.L().Info("[DB] ✅ Database connection successfully configured with connection pooling.")
-
-	lc.Append(fx.Hook{
-		OnStop: func(ctx context.Context) error {
-			zap.L().Info("[DB] Closing connection pool...")
-			return sqlDB.Close()
-		},
-	})
-
 	return db, nil
 }
 
@@ -69,6 +47,33 @@ func NewTest() (*gorm.DB, error) {
 
 	return db, nil
 }
+
+func RegisterConnectionPool(lc fx.Lifecycle, cfg *config.Config, db *gorm.DB) error {
+	sqlDB, err := db.DB()
+	if err != nil {
+		return err
+	}
+
+	sqlDB.SetMaxIdleConns(cfg.ConnectionPool.MaxIdleConn)
+	sqlDB.SetMaxOpenConns(cfg.ConnectionPool.MaxOpenConns)
+	sqlDB.SetConnMaxLifetime(cfg.ConnectionPool.ConnMaxLifetime)
+	sqlDB.SetConnMaxIdleTime(cfg.ConnectionPool.ConnMaxIdleTime)
+
+	zap.L().Info("[DB] ✅ Database connection successfully configured with connection pooling.")
+	lc.Append(fx.Hook{
+		OnStop: func(ctx context.Context) error {
+			zap.L().Info("[DB] Closing connection pool...")
+			return sqlDB.Close()
+		},
+	})
+
+	return nil
+}
+
+// func RegisterAuditHooks(db *gorm.DB) {
+// 	db.Callback().Create().Before("gorm:create").Register("audit_before_create", BeforeCreate)
+// 	db.Callback().Update().Before("gorm:update").Register("audit_before_update", BeforeSave)
+// }
 
 func Otel(db *gorm.DB) error {
 	// Register the OpenTelemetry plugin with GORM

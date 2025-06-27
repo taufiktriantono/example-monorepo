@@ -46,4 +46,4 @@ SESSION:
 ACCESS_CONTROL:
   ADAPTER: file
   MODEL: conf/model.conf
-  POLICY: conf/policy.csv
+  POLICY: 

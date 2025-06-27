@@ -30,6 +30,7 @@ func NewApprovalTemplateRepository(
 	repo repository.Repository[domain.ApprovalTemplate],
 ) ApprovalTemplateRepository {
 	return &approvaltemplate{
+		db:   db,
 		repo: repo,
 	}
 }
