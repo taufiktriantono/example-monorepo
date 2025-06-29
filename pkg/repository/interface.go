@@ -3,12 +3,13 @@ package repository
 import (
 	"context"
 
+	"github.com/taufiktriantono/api-first-monorepo/pkg/db/option"
 	"gorm.io/gorm"
 )
 
 type Repository[T any] interface {
 	WithTrx(tx *gorm.DB) Repository[T]
-	Find(ctx context.Context, query *T, opts ...QueryOption) ([]*T, error)
+	Find(ctx context.Context, query *T, opts ...option.QueryOption) ([]*T, error)
 	FindOne(ctx context.Context, query *T) (*T, error)
 	Create(ctx context.Context, resource *T) error
 	Update(ctx context.Context, resourceID string, resource *T) error

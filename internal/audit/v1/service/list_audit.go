@@ -6,21 +6,21 @@ import (
 	"github.com/taufiktriantono/api-first-monorepo/internal/audit/v1/domain"
 	"github.com/taufiktriantono/api-first-monorepo/internal/audit/v1/dto"
 	"github.com/taufiktriantono/api-first-monorepo/internal/audit/v1/mapper"
-	"github.com/taufiktriantono/api-first-monorepo/pkg/repository"
+	"github.com/taufiktriantono/api-first-monorepo/pkg/db/option"
+	"github.com/taufiktriantono/api-first-monorepo/pkg/db/pagination"
 	"go.uber.org/zap"
 )
 
 func (s *auditservice) List(ctx context.Context, req *dto.ListAuditLogRequest) (*dto.ListAuditLogResponse, error) {
-	opts := []repository.QueryOption{
-		repository.WithPagination(req.Pagination),
-		repository.WithSortBy(req.QuerySortBy),
-		repository.WithStartAndEndDate(req.QueryStartAndEndDate),
-		repository.WithCustomField("type", req.Types),
-		repository.WithPreload(
-			[]string{
-				"Fields",
-			},
-		),
+	opts := []option.QueryOption{
+		option.ApplyPagination(req.Pagination),
+		option.WithSortBy(req.QuerySortBy),
+		option.ApplyOperator(option.Condition{
+			Field:    "type",
+			Operator: option.IN,
+			Value:    req.Types,
+		}),
+		option.WithPreloads("Fields"),
 	}
 
 	audits, err := s.audit.Find(ctx, &domain.AuditLog{
@@ -35,7 +35,7 @@ func (s *auditservice) List(ctx context.Context, req *dto.ListAuditLogRequest) (
 	}
 
 	return &dto.ListAuditLogResponse{
-		PageInfo: repository.BuildCursorPageInfo(audits, req.Pagination.Limit, AuditLogCursorExtractor),
+		PageInfo: pagination.BuildCursorPageInfo(audits, req.Pagination.Limit, AuditLogCursorExtractor),
 		Data:     mapper.ToDtoAuditList(audits),
 	}, nil
 }

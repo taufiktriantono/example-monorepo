@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/gin-gonic/gin"
 	"github.com/taufiktriantono/api-first-monorepo/pkg/config"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -29,7 +30,7 @@ type Server struct {
 type Params struct {
 	fx.In
 	Config  *config.Config
-	Handler http.Handler
+	Handler *gin.Engine
 }
 
 func New(p Params) *Server {

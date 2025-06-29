@@ -18,19 +18,20 @@ type ApprovalTemplateState string
 var (
 	Draft    ApprovalTemplateState = "draft"
 	Active   ApprovalTemplateState = "active"
+	Inactive ApprovalTemplateState = "inactive"
 	Archived ApprovalTemplateState = "archived"
 )
 
 func (ats ApprovalTemplateState) String() string {
 	switch ats {
-	case Draft, Active, Archived:
+	case Draft, Active, Inactive, Archived:
 		return string(ats)
 	default:
 		return ""
 	}
 }
 
-func (ats ApprovalTemplateState) IsValid() bool {
+func (ats ApprovalTemplateState) Valid() bool {
 	switch ats {
 	case Draft, Active, Archived:
 		return true
@@ -47,6 +48,10 @@ type ApprovalTemplate struct {
 	Status       ApprovalTemplateState `gorm:"column:status"`
 	CreatedAt    time.Time             `gorm:"column:created_at"`
 	UpdatedAt    time.Time             `gorm:"column:updated_at"`
+}
+
+func (m *ApprovalTemplate) TableName() string {
+	return "approval.templates"
 }
 
 type ApprovalTemplateParams struct {

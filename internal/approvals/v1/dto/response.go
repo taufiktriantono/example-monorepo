@@ -3,7 +3,7 @@ package dto
 import (
 	"time"
 
-	"github.com/taufiktriantono/api-first-monorepo/pkg/repository"
+	"github.com/taufiktriantono/api-first-monorepo/pkg/db/pagination"
 )
 
 type ApprovalTemplateResponse struct {
@@ -18,7 +18,7 @@ type ApprovalTemplateResponse struct {
 }
 
 type ListTemplateResponse struct {
-	PageInfo repository.PageInfo         `json:"page_info"`
+	PageInfo pagination.PageInfo         `json:"page_info"`
 	Data     []*ApprovalTemplateResponse `json:"data"`
 }
 

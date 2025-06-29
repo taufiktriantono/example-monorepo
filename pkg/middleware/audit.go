@@ -9,7 +9,7 @@ import (
 	"github.com/taufiktriantono/api-first-monorepo/pkg/message"
 )
 
-func AuditMiddleware(producer message.Publisher, serviceName string) gin.HandlerFunc {
+func Audit(producer message.Publisher, serviceName string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
 		c.Next()

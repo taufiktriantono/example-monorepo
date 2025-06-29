@@ -6,7 +6,9 @@ import (
 	"github.com/taufiktriantono/api-first-monorepo/internal/approvals/v1/domain"
 	"github.com/taufiktriantono/api-first-monorepo/internal/approvals/v1/dto"
 	"github.com/taufiktriantono/api-first-monorepo/internal/approvals/v1/mapper"
-	"github.com/taufiktriantono/api-first-monorepo/pkg/repository"
+	"github.com/taufiktriantono/api-first-monorepo/pkg/db/option"
+	"github.com/taufiktriantono/api-first-monorepo/pkg/db/pagination"
+	"github.com/taufiktriantono/api-first-monorepo/pkg/errutil"
 	"go.uber.org/zap"
 )
 
@@ -15,31 +17,29 @@ func (s *approvalservice) ListTemplate(ctx context.Context, req *dto.ListTemplat
 		Status: domain.ApprovalTemplateState(req.Status),
 	}
 
-	queryopts := []repository.QueryOption{
-		repository.WithPagination(req.Pagination),
-		repository.WithStartAndEndDate(req.QueryStartAndEndDate),
-		repository.WithSortBy(NewTemplateQuerySortBy(req.SortBy, req.OrderBy)),
-		repository.WithRange(req.QueryRange),
-		repository.WithResourceTypes(req.ResourceTypes),
+	opts := []option.QueryOption{
+		option.ApplyPagination(req.Pagination),
+		option.WithRange(req.QueryRange),
+		option.WithSortBy(NewTemplateQuerySortBy(req.SortBy, req.OrderBy)),
 	}
 
-	templates, err := s.approvaltemplate.Find(ctx, f, queryopts...)
+	if len(req.ResourceTypes) > 0 {
+		opts = append(opts, option.ApplyOperator(option.Condition{
+			Field:    "resource_type",
+			Operator: option.IN,
+			Value:    req.ResourceTypes,
+		}))
+	}
+
+	templates, err := s.approvaltemplate.Find(ctx, f, opts...)
 	if err != nil {
 		zap.L().Error("Failed to fetch list template", zap.Any("query", req), zap.Error(err))
-		return nil, err
+		return nil, errutil.Internal(err.Error(), nil)
 	}
 
 	newtemplates := make([]*dto.ApprovalTemplateResponse, 0)
 	for _, template := range templates {
-		newtemplate := &dto.ApprovalTemplateResponse{
-			ID:          template.ID,
-			Slug:        template.Slug,
-			DisplayName: template.DisplayName,
-			Status:      template.Status.String(),
-			CreatedAt:   template.CreatedAt,
-			UpdatedAt:   template.UpdatedAt,
-		}
-
+		newtemplate := mapper.ToDtoApprovalTemplate(template)
 		steps, err := s.approvaltemplatestep.Find(ctx, &domain.ApprovalTemplateStep{
 			ApprovalTemplateID: template.ID,
 		})
@@ -53,7 +53,7 @@ func (s *approvalservice) ListTemplate(ctx context.Context, req *dto.ListTemplat
 	}
 
 	return &dto.ListTemplateResponse{
-		PageInfo: repository.BuildCursorPageInfo(templates, req.Pagination.Limit, ApprovalTemplateCursorExtractor),
+		PageInfo: pagination.BuildCursorPageInfo(templates, req.Pagination.Limit, ApprovalTemplateCursorExtractor),
 		Data:     newtemplates,
 	}, nil
 }

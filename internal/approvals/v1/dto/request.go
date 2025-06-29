@@ -1,7 +1,8 @@
 package dto
 
 import (
-	"github.com/taufiktriantono/api-first-monorepo/pkg/repository"
+	"github.com/taufiktriantono/api-first-monorepo/pkg/db/option"
+	"github.com/taufiktriantono/api-first-monorepo/pkg/db/pagination"
 )
 
 type ApprovalTemplateRequest struct {
@@ -37,19 +38,18 @@ type UpdateTemplateRequest struct {
 }
 
 type ListTemplatRequest struct {
-	repository.Pagination
-	repository.QueryStartAndEndDate
-	repository.QuerySortBy
-	repository.QueryRange
+	pagination.Pagination
+	option.QuerySortBy
+	option.QueryRange
 	ResourceTypes []string `form:"resource_types[]"` // Multiple resource types via query param
 	Status        string   `form:"status"`
 }
 
 type ListApprovalRequest struct {
-	repository.Pagination
-	repository.QueryStartAndEndDate
-	repository.QuerySortBy
-	repository.QueryRange
+	pagination.Pagination
+	option.QueryStartAndEndDate
+	option.QuerySortBy
+	option.QueryRange
 	ResourceIDs   []string `form:"resource_ids[]"`
 	ResourceTypes []string `form:"resource_types[]"`
 	RequestedBy   string   `form:"requested_by"`

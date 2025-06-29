@@ -24,6 +24,10 @@ type ApprovalStep struct {
 	UpdatedAt     time.Time     `gorm:"column:updated_at"`
 }
 
+func (m *ApprovalStep) TableName() string {
+	return "approval.approval_steps"
+}
+
 type ApprovalStepParams struct {
 	TemplateStepID string
 	ApprovalID     string

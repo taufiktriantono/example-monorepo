@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/taufiktriantono/api-first-monorepo/internal/approvals/v1/domain"
+	"github.com/taufiktriantono/api-first-monorepo/pkg/db/option"
 	"github.com/taufiktriantono/api-first-monorepo/pkg/repository"
 	"gorm.io/gorm"
 )
@@ -12,7 +13,7 @@ import (
 //go:generate mockgen -source=approval_template_step_repository.go -destination=mock_approval_template_step_repository.go -package=repository
 type ApprovalTemplateStepRepository interface {
 	WithTrx(tx *gorm.DB) ApprovalTemplateStepRepository
-	Find(ctx context.Context, f *domain.ApprovalTemplateStep, opts ...repository.QueryOption) ([]*domain.ApprovalTemplateStep, error)
+	Find(ctx context.Context, f *domain.ApprovalTemplateStep, opts ...option.QueryOption) ([]*domain.ApprovalTemplateStep, error)
 	FindOne(ctx context.Context, f *domain.ApprovalTemplateStep) (*domain.ApprovalTemplateStep, error)
 	Create(ctx context.Context, resource *domain.ApprovalTemplateStep) error
 	Update(ctx context.Context, resourceID string, resource *domain.ApprovalTemplateStep) error
@@ -43,7 +44,7 @@ func (r *approvaltemplatestep) WithTrx(tx *gorm.DB) ApprovalTemplateStepReposito
 	}
 }
 
-func (r *approvaltemplatestep) Find(ctx context.Context, f *domain.ApprovalTemplateStep, opts ...repository.QueryOption) ([]*domain.ApprovalTemplateStep, error) {
+func (r *approvaltemplatestep) Find(ctx context.Context, f *domain.ApprovalTemplateStep, opts ...option.QueryOption) ([]*domain.ApprovalTemplateStep, error) {
 	return r.repo.Find(ctx, f, opts...)
 }
 

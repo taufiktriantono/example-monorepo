@@ -50,6 +50,10 @@ type Approval struct {
 	UpdatedAt          time.Time        `gorm:"column:updated_at"`
 }
 
+func (m *Approval) TableName() string {
+	return "approval.approvals"
+}
+
 type ApprovalParams struct {
 	ApprovalTemplateID string
 	ResourceID         string

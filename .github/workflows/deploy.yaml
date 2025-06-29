@@ -1,0 +1,62 @@
+name: Deploy All Service
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - name: approval
+            path: approval
+            migration: approval
+            db_url: ${{ secrets.APPROVAL_DB_URL }}
+
+    name: Deploy ${{ matrix.service.name }} Service
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Set up Go (jika pakai Go)
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Install migrate tool
+        run: |
+          curl -L https://github.com/golang-migrate/migrate/releases/download/v4.16.2/migrate.linux-amd64.tar.gz \
+            | tar xz && sudo mv migrate /usr/local/bin/
+
+      - name: Run migrations
+        run: |
+          echo "${{ matrix.service.db_url }}" > .env
+          migrate -path migrations/${{ matrix.service.migration }} -database "${{ matrix.service.db_url }}" up
+
+      # - name: Install dependencies
+      #   run: go mod tidy
+
+      # - name: Run Tests
+      #   run: go test ./... -v -coverprofile=coverage.out
+
+      # - name: Upload coverage to Codecov
+      #   uses: codecov/codecov-action@v3
+      #   with:
+      #     file: coverage.out
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Build and deploy ${{ matrix.service.name }}
+        run: |
+          docker build -t registry/${{ matrix.service.name }}-svc ./apps/${{ matrix.service.path }}
+          kubectl apply -f k8s/${{ matrix.service.name }}.yaml

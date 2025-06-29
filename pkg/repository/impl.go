@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/taufiktriantono/api-first-monorepo/pkg/db/option"
 	"gorm.io/gorm"
 )
 
@@ -19,7 +20,7 @@ func (r *store[T]) WithTrx(tx *gorm.DB) Repository[T] {
 	return &store[T]{db: tx}
 }
 
-func (r *store[T]) Find(ctx context.Context, query *T, opts ...QueryOption) ([]*T, error) {
+func (r *store[T]) Find(ctx context.Context, query *T, opts ...option.QueryOption) ([]*T, error) {
 	var result []*T
 	stmt := r.buildQuery(ctx, query, opts...)
 	err := stmt.Find(&result).Error
@@ -65,7 +66,7 @@ func (r *store[T]) BatchUpdate(ctx context.Context, query *T, resource *T) error
 	return r.db.WithContext(ctx).Where(query).Updates(resource).Error
 }
 
-func (s *store[T]) buildQuery(ctx context.Context, filter *T, opts ...QueryOption) *gorm.DB {
+func (s *store[T]) buildQuery(ctx context.Context, filter *T, opts ...option.QueryOption) *gorm.DB {
 	db := s.db.WithContext(ctx).Where(filter)
 
 	for _, opt := range opts {

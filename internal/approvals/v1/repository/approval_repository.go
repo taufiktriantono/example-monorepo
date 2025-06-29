@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/taufiktriantono/api-first-monorepo/internal/approvals/v1/domain"
+	"github.com/taufiktriantono/api-first-monorepo/pkg/db/option"
 	"github.com/taufiktriantono/api-first-monorepo/pkg/repository"
 	"gorm.io/gorm"
 )
@@ -12,7 +13,7 @@ import (
 //go:generate mockgen -source=approval_repository.go -destination=mock_approval_repository.go -package=repository
 type ApprovalRepository interface {
 	WithTrx(tx *gorm.DB) ApprovalRepository
-	Find(ctx context.Context, f *domain.Approval, opts ...repository.QueryOption) ([]*domain.Approval, error)
+	Find(ctx context.Context, f *domain.Approval, opts ...option.QueryOption) ([]*domain.Approval, error)
 	FindOne(ctx context.Context, f *domain.Approval) (*domain.Approval, error)
 	Create(ctx context.Context, resource *domain.Approval) error
 	Update(ctx context.Context, resourceID string, resource *domain.Approval) error
@@ -42,7 +43,7 @@ func (r *approval) WithTrx(tx *gorm.DB) ApprovalRepository {
 	}
 }
 
-func (r *approval) Find(ctx context.Context, f *domain.Approval, opts ...repository.QueryOption) ([]*domain.Approval, error) {
+func (r *approval) Find(ctx context.Context, f *domain.Approval, opts ...option.QueryOption) ([]*domain.Approval, error) {
 	return r.repo.Find(ctx, f, opts...)
 }
 

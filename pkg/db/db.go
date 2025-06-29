@@ -21,9 +21,10 @@ var Module = fx.Module("database",
 		Dialect,
 		New,
 	),
+	fx.Invoke(RegisterConnectionPool),
 )
 
-func New(cfg *config.Config, dialector gorm.Dialector, opts ...gorm.Option) (*gorm.DB, error) {
+func New(dialector gorm.Dialector, opts ...gorm.Option) (*gorm.DB, error) {
 	// Initialize the GORM DB connection
 	db, err := gorm.Open(dialector, opts...)
 	if err != nil {

@@ -33,7 +33,7 @@ func NewConsulRegistry(address, serviceName, serviceID, host string, port int) (
 		Address: host,
 		Port:    port,
 		Check: &api.AgentServiceCheck{
-			HTTP:     fmt.Sprintf("http://%s:%d/health", host, port),
+			HTTP:     fmt.Sprintf("http://%s:%d/health/readiness", host, port),
 			Interval: "10s",
 			Timeout:  "5s",
 		},

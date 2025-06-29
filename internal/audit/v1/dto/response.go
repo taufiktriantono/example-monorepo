@@ -3,7 +3,7 @@ package dto
 import (
 	"time"
 
-	"github.com/taufiktriantono/api-first-monorepo/pkg/repository"
+	"github.com/taufiktriantono/api-first-monorepo/pkg/db/pagination"
 )
 
 type AuditLogResponse struct {
@@ -29,6 +29,6 @@ type AuditLogFieldResponse struct {
 }
 
 type ListAuditLogResponse struct {
-	PageInfo repository.PageInfo `json:"page_info"`
+	PageInfo pagination.PageInfo `json:"page_info"`
 	Data     []*AuditLogResponse `json:"data"`
 }

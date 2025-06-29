@@ -10,10 +10,7 @@ import (
 	"go.uber.org/fx"
 )
 
-var (
-	config = viper.New()
-)
-
+var config = viper.New()
 var Module = fx.Module("config", fx.Provide(LoadConfig))
 
 type Config struct {
@@ -103,11 +100,12 @@ func GetInt64(target string) int64 {
 	return config.GetInt64(target)
 }
 
-func LoadConfig(services ...string) (*Config, error) {
+func LoadConfig() (*Config, error) {
 	config.SetConfigName("config")
 	config.SetConfigType("yaml")
-	config.AddConfigPath("./configs")
+	config.AddConfigPath(".")
 
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	config.AutomaticEnv()
 
 	if err := config.ReadInConfig(); err != nil {
@@ -128,20 +126,20 @@ func LoadConfig(services ...string) (*Config, error) {
 		return nil, err
 	}
 
-	for _, service := range services {
-		newCfg := viper.New()
-		newCfg.SetConfigName(service)
-		newCfg.SetConfigType("yaml")
-		newCfg.AddConfigPath("./conf")
+	// for _, service := range services {
+	// 	newCfg := viper.New()
+	// 	newCfg.SetConfigName(service)
+	// 	newCfg.SetConfigType("yaml")
+	// 	newCfg.AddConfigPath("./conf")
 
-		if err := newCfg.ReadInConfig(); err != nil {
-			return nil, err
-		}
+	// 	if err := newCfg.ReadInConfig(); err != nil {
+	// 		return nil, err
+	// 	}
 
-		if err := decryptRecursive("", secret, newCfg.AllSettings()); err != nil {
-			return nil, err
-		}
-	}
+	// 	if err := decryptRecursive("", secret, newCfg.AllSettings()); err != nil {
+	// 		return nil, err
+	// 	}
+	// }
 
 	return &cfg, nil
 }

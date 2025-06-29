@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/taufiktriantono/api-first-monorepo/internal/audit/v1/domain"
+	"github.com/taufiktriantono/api-first-monorepo/pkg/db/option"
 	"github.com/taufiktriantono/api-first-monorepo/pkg/repository"
 	"gorm.io/gorm"
 )
@@ -11,7 +12,7 @@ import (
 //go:generate mockgen -source=audit_repository.go -destination=mock_audit_repository.go -package=repository
 type AuditRepository interface {
 	WithTrx(tx *gorm.DB) AuditRepository
-	Find(context.Context, *domain.AuditLog, ...repository.QueryOption) ([]*domain.AuditLog, error)
+	Find(context.Context, *domain.AuditLog, ...option.QueryOption) ([]*domain.AuditLog, error)
 }
 
 type audit struct {
@@ -36,6 +37,6 @@ func (r *audit) WithTrx(tx *gorm.DB) AuditRepository {
 	}
 }
 
-func (r *audit) Find(ctx context.Context, f *domain.AuditLog, opts ...repository.QueryOption) ([]*domain.AuditLog, error) {
+func (r *audit) Find(ctx context.Context, f *domain.AuditLog, opts ...option.QueryOption) ([]*domain.AuditLog, error) {
 	return r.repo.Find(ctx, f, opts...)
 }

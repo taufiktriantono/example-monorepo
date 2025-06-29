@@ -14,7 +14,7 @@ import (
 	reflect "reflect"
 
 	domain "github.com/taufiktriantono/api-first-monorepo/internal/audit/v1/domain"
-	repository "github.com/taufiktriantono/api-first-monorepo/pkg/repository"
+	option "github.com/taufiktriantono/api-first-monorepo/pkg/db/option"
 	gomock "go.uber.org/mock/gomock"
 	gorm "gorm.io/gorm"
 )
@@ -44,7 +44,7 @@ func (m *MockAuditRepository) EXPECT() *MockAuditRepositoryMockRecorder {
 }
 
 // Find mocks base method.
-func (m *MockAuditRepository) Find(arg0 context.Context, arg1 *domain.AuditLog, arg2 ...repository.QueryOption) ([]*domain.AuditLog, error) {
+func (m *MockAuditRepository) Find(arg0 context.Context, arg1 *domain.AuditLog, arg2 ...option.QueryOption) ([]*domain.AuditLog, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{arg0, arg1}
 	for _, a := range arg2 {

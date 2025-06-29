@@ -16,13 +16,13 @@ var (
 func (at ApproverType) String() string {
 	switch at {
 	case Role, User:
-		return at.String()
+		return string(at)
 	default:
 		return ""
 	}
 }
 
-func (at ApproverType) IsValid() bool {
+func (at ApproverType) Valid() bool {
 	switch at {
 	case Role, User:
 		return true
@@ -48,7 +48,7 @@ func (st StepType) String() string {
 	}
 }
 
-func (st StepType) IsValid() bool {
+func (st StepType) Valid() bool {
 	switch st {
 	case Manual, Auto, Notification:
 		return true
@@ -60,23 +60,23 @@ func (st StepType) IsValid() bool {
 type SLAUnit string
 
 var (
-	Minute SLAUnit = "minutes"
-	Hours  SLAUnit = "hours"
-	Days   SLAUnit = "days"
+	Minute SLAUnit = "minute"
+	Hour   SLAUnit = "hour"
+	Day    SLAUnit = "day"
 )
 
 func (su SLAUnit) String() string {
 	switch su {
-	case Minute, Hours, Days:
+	case Minute, Hour, Day:
 		return string(su)
 	default:
 		return ""
 	}
 }
 
-func (su SLAUnit) IsValid() bool {
+func (su SLAUnit) Valid() bool {
 	switch su {
-	case Minute, Hours, Days:
+	case Minute, Hour, Day:
 		return true
 	default:
 		return false
@@ -96,6 +96,10 @@ type ApprovalTemplateStep struct {
 	SLAValue           int              `gorm:"column:sla_value"`
 	CreatedAt          time.Time        `gorm:"column:created_at"`
 	UpdatedAt          time.Time        `gorm:"column:updated_at"`
+}
+
+func (m *ApprovalTemplateStep) TableName() string {
+	return "approval.template_steps"
 }
 
 type ApprovalTemplateStepParams struct {
@@ -134,17 +138,17 @@ func (m *ApprovalTemplateStep) DueAt() time.Time {
 	}
 }
 
-func (m *ApprovalTemplateStep) IsValid() bool {
-	if !m.StepType.IsValid() {
-		return m.StepType.IsValid()
+func (m *ApprovalTemplateStep) Valid() bool {
+	if !m.StepType.Valid() {
+		return m.StepType.Valid()
 	}
 
-	if !m.ApproverType.IsValid() {
-		return m.ApproverType.IsValid()
+	if !m.ApproverType.Valid() {
+		return m.ApproverType.Valid()
 	}
 
-	if !m.SLAUnit.IsValid() {
-		return m.SLAUnit.IsValid()
+	if !m.SLAUnit.Valid() {
+		return m.SLAUnit.Valid()
 	}
 
 	if m.SLAValue < 1 {

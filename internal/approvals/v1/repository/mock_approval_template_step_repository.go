@@ -14,7 +14,7 @@ import (
 	reflect "reflect"
 
 	domain "github.com/taufiktriantono/api-first-monorepo/internal/approvals/v1/domain"
-	repository "github.com/taufiktriantono/api-first-monorepo/pkg/repository"
+	option "github.com/taufiktriantono/api-first-monorepo/pkg/db/option"
 	gomock "go.uber.org/mock/gomock"
 	gorm "gorm.io/gorm"
 )
@@ -101,7 +101,7 @@ func (mr *MockApprovalTemplateStepRepositoryMockRecorder) Delete(ctx, resourceID
 }
 
 // Find mocks base method.
-func (m *MockApprovalTemplateStepRepository) Find(ctx context.Context, f *domain.ApprovalTemplateStep, opts ...repository.QueryOption) ([]*domain.ApprovalTemplateStep, error) {
+func (m *MockApprovalTemplateStepRepository) Find(ctx context.Context, f *domain.ApprovalTemplateStep, opts ...option.QueryOption) ([]*domain.ApprovalTemplateStep, error) {
 	m.ctrl.T.Helper()
 	varargs := []any{ctx, f}
 	for _, a := range opts {

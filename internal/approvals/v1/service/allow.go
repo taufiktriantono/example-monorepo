@@ -1,6 +1,6 @@
 package service
 
-import "github.com/taufiktriantono/api-first-monorepo/pkg/repository"
+import "github.com/taufiktriantono/api-first-monorepo/pkg/db/option"
 
 // templateSortAllowFields specifies the allowed fields for sorting templates.
 var templateSortAllowFields = map[string]bool{
@@ -26,8 +26,8 @@ var approvalStepRangeAllowFields = map[string]bool{
 	"step_order": true,
 }
 
-func NewTemplateQuerySortBy(sortBy, orderBy string) repository.QuerySortBy {
-	return repository.QuerySortBy{
+func NewTemplateQuerySortBy(sortBy, orderBy string) option.QuerySortBy {
+	return option.QuerySortBy{
 		SortBy:  sortBy,
 		OrderBy: orderBy,
 		Allow:   templateSortAllowFields,
